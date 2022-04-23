@@ -21,10 +21,22 @@ namespace CamposBankWebApp.Pages.Accounts
         }
 
         public IList<Account> Account { get;set; }
-
+     
+        [BindProperty(SupportsGet = true)]
+        public string SearchString { get; set; }
+        
         public async Task OnGetAsync()
         {
-            Account = await _context.Account.ToListAsync();
+            var accounts = from m in _context.Account
+                        select m;
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                accounts = accounts.Where(s => s.AccountName.Contains(SearchString) 
+                | s.FirstName.Contains(SearchString) | s.LastName.Contains(SearchString)
+                | s.Nick.Contains(SearchString));
+
+            }
+            Account = await accounts.ToListAsync();
         }
     }
 }
